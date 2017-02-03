@@ -14,7 +14,7 @@ void EraseFlashChip(void)
 
     // poll 
     PortD = 1;
-    while ((FlashPtr[0] & 0x08) == 0)  // Poll DQ3 
+    while ((FlashPtr[0] & 0x80) == 0)  // Poll DQ7 for erase 
     {
         PortD = 2;
     }
@@ -30,24 +30,27 @@ void FlashReset(void)
 /* erase sector by writing to address with data*/
 void FlashSectorErase(int SectorAddress)
 {
+    unsigned short i;
     unsigned char *FlashPtr = (unsigned char*)FlashStart;
-    unsigned char SectorAddressStart = (SectorAddress < 8) ? (((SectorAddress) << 12) << 1) : (((SectorAddress - 7) << 16) << 1);
+    unsigned char SectorAddressStart = (SectorAddress <= 8) ? (((SectorAddress/2) << 11) << 1) : (((SectorAddress - 7) << 16) << 1);
     SectorAddress = (SectorAddress < 8) ?  SectorAddress : SectorAddress;
-
-    FlashPtr[0xAAA << 1] = 0xAA;
-    FlashPtr[0x555 << 1] = 0x55;
-    FlashPtr[0xAAA << 1] = 0x80;
-    FlashPtr[0xAAA << 1] = 0xAA;
-    FlashPtr[0x555 << 1] = 0x55;
-    FlashPtr[1 << 13] = 0x30;
-
-    // Poll 
-    PortD = 1; // turn on LEDG0, turn off LEDG1
-    while ((FlashPtr[SectorAddressStart] & 0x08) == 0)  // poll DQ3
+    for (i=0; i<21; i++)
     {
-        PortD = 2; // turn on LEDG1, turn off LEDG0
+        FlashPtr[0xAAA << 1] = 0xAA;
+        FlashPtr[0x555 << 1] = 0x55;
+        FlashPtr[0xAAA << 1] = 0x80;
+        FlashPtr[0xAAA << 1] = 0xAA;
+        FlashPtr[0x555 << 1] = 0x55;
+        FlashPtr[1 << i] = 0x30;
+
+        // Poll 
+        PortD = 1; // turn on LEDG0, turn off LEDG1
+        while ((FlashPtr[SectorAddressStart] & 0x80) == 0)  // poll DQ7
+        {
+            PortD = 2; // turn on LEDG1, turn off LEDG0
+        }
+        PortD = 1; // turn on LEDG0, turn off LEDG1
     }
-    PortD = 1; // turn on LEDG0, turn off LEDG1
 }
 
 
@@ -73,7 +76,7 @@ void FlashProgram(unsigned int AddressOffset, int ByteData)		// write a byte to 
             goto PROG_PASS;
         }
         PortD = 2; // turn on LEDG1, turn off LEDG0
-        printf("\r\nreadData:%x  ByteData:%x", readData, ByteData);
+        //printf("\r\nreadData:%x  ByteData:%x", readData, ByteData);
     } while ((readData & 0x20) == 0);
 
     readData = FlashRead(AddressOffset);
@@ -89,7 +92,7 @@ void FlashProgram(unsigned int AddressOffset, int ByteData)		// write a byte to 
 
 PROG_PASS:
     PortD = 1; // turn on LEDG0, turn off LEDG1
-    printf("\r\nWrote to address: %x", AddressOffset);
+    //printf("\r\nWrote to address: %x", AddressOffset);
 }
 
 /* program chip to read a byte */

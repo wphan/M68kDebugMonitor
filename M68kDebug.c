@@ -513,15 +513,15 @@ void ProgramFlashChip(void)
     printf("\r\nErasing Flash Memory.....") ;
 
     //erase first 64 as 8 sectors of 8k each
-    for(i = 0; i < 8; i++)
-        FlashSectorErase( i );
+    //for(i = 0; i < 8; i++)
+    FlashSectorErase( 1 );
 
 
     //erase next sectors of 64 k block
 
-    for(i = 1; i < Num_FlashSectors + 1 ; i++)
-        FlashSectorErase( i << 3 );
-    EraseFlashChip();
+    //for(i = 1; i < Num_FlashSectors + 1 ; i++)
+       // FlashSectorErase( i << 3 );
+   // EraseFlashChip();
     return;
     printf("\r\nProgramming Flash Memory.....") ;
 

@@ -521,7 +521,8 @@ void ProgramFlashChip(void)
 
     for(i = 1; i < Num_FlashSectors + 1 ; i++)
         FlashSectorErase( i << 3 );
-
+    EraseFlashChip();
+    return;
     printf("\r\nProgramming Flash Memory.....") ;
 
     for(i = 0; i < FlashSize; i ++) {   // i = address offset to the Flash chip
@@ -551,7 +552,7 @@ void LoadFromFlashChip(void)
 {
     char c;
     int i ;
-    unsigned char *RamPtr = (unsigned char *)(ProgramStart) ;      // pointer to start of user program
+    unsigned char *RamPtr = (unsigned char *)(ProgramStart);      // pointer to start of user program
     unsigned char *FlashPtr = (unsigned char *)(FlashStart);        // pointer to flash chip base address;
 
 
@@ -1467,7 +1468,7 @@ void MemoryTest(void)
 
     // align Start and End addresses
     Start = Start + (Start % 2); // make sure starting on an even address
-   h num_iter = (End - Start + 1) / test_size_b;
+    num_iter = (End - Start + 1) / test_size_b;
     for(i = 0; i < num_iter; i++)
     {
         //display progress on 7seg

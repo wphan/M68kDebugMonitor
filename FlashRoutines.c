@@ -30,18 +30,19 @@ void FlashReset(void)
 /* erase sector by writing to address with data*/
 void FlashSectorErase(int SectorAddress)
 {
-    unsigned short i;
     unsigned char *FlashPtr = (unsigned char*)FlashStart;
-    unsigned char SectorAddressStart = (SectorAddress <= 8) ? (((SectorAddress/2) << 11) << 1) : (((SectorAddress - 7) << 16) << 1);
-    SectorAddress = (SectorAddress < 8) ?  SectorAddress : SectorAddress;
-    for (i=0; i<21; i++)
+    // For sectors 0-7, Shift 12 for 0 -> 12, then shift 1 for byte logic, then shift 1 for sector address mapping.
+    unsigned int SectorAddressStart =  SectorAddress << 14; //(SectorAddress < 8) ? ((SectorAddress) << 14) : ((SectorAddress - 7) << 17);
+
+    printf("\r\nStart Address: %i, %x",SectorAddressStart,SectorAddressStart);
+  //  SectorAddress = (SectorAddress < 8) ?  SectorAddress : SectorAddress;
     {
         FlashPtr[0xAAA << 1] = 0xAA;
         FlashPtr[0x555 << 1] = 0x55;
         FlashPtr[0xAAA << 1] = 0x80;
         FlashPtr[0xAAA << 1] = 0xAA;
         FlashPtr[0x555 << 1] = 0x55;
-        FlashPtr[1 << i] = 0x30;
+        FlashPtr[SectorAddressStart] = 0x30;
 
         // Poll 
         PortD = 1; // turn on LEDG0, turn off LEDG1

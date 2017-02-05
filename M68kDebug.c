@@ -1467,7 +1467,7 @@ void MemoryTest(void)
 
     // align Start and End addresses
     Start = Start + (Start % 2); // make sure starting on an even address
-   h num_iter = (End - Start + 1) / test_size_b;
+    num_iter = (End - Start + 1) / test_size_b;
     for(i = 0; i < num_iter; i++)
     {
         //display progress on 7seg
